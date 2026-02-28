@@ -12,4 +12,7 @@ reports/*.html
 .vscode/
 
 .DS_Store       
-Thumbs.db       
+Thumbs.db
+
+# Arquivos de versão criados por erro
+=*
