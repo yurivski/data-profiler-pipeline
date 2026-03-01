@@ -1,6 +1,6 @@
 # Script para gerar perfil de dados com validação de qualidade.
 
-import pandas as pandas
+import pandas as pd
 from ydata_profiling import ProfileReport
 from pathlib import Path
 from datetime import datetime
