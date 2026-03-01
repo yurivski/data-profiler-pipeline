@@ -1,9 +1,16 @@
 [project]
 name = "data-profiler-pipeline"
 version = "0.1.0"
-description = "Add your description here"
+description = "Automated data profiling and quality gates for ETL pipelines"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.8"
 dependencies = [
-    "pandas>=3.0.1",
+    "pandas>=2.0.0,<3.0",
+    "setuptools>=75.3.4",
+    "ydata-profiling>=4.6.0",
+    "setuptools",
 ]
+
+[project.urls]
+Homepage = "https://github.com/yurivski/data-profiler-pipeline"
+Repository = "https://github.com/yurivski/data-profiler-pipeline"
