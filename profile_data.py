@@ -1,11 +1,14 @@
 # Script para gerar perfil de dados com validação de qualidade.
 
 import pandas as pd
+import glob
+import os
 from ydata_profiling import ProfileReport
 from pathlib import Path
 from datetime import datetime
 
-csv_file = '20260228_Pedidos_csv_2025.csv'
+file_dir = 'Arquivos_csv_2025'
+file_pattern = "20260228_Pedidos_csv_2025.csv"
 
 max_duplicates_pct = 5.0 # %
 max_missing_pct = 10.0 # %
@@ -41,9 +44,9 @@ def extrair_estatisticas(profile):
         'total_linhas': tabela['n'],
         'total_colunas': tabela['n_var'],
         'duplicatas': tabela['n_duplicates'],
-        'pct_dublicatas': (tabela['n_duplicates'] / tabela['n'] * 100) if tabela['n'] > 0 else 0,
+        'pct_duplicatas': (tabela['n_duplicates'] / tabela['n'] * 100) if tabela['n'] > 0 else 0,
         'valores_faltantes': tabela['n_cells_missing'],
-        'pct_faltantes': tabela['p_cells_missings'] * 100,
+        'pct_faltantes': tabela['p_cells_missing'] * 100,
     }
     return stats
 
@@ -68,8 +71,11 @@ def validar_qualidade(stats, max_dup=max_duplicates_pct, max_miss=max_missing_pc
     return aprovado
 
 def main():
-    fd = carregar_dados(csv_file)
-    profile = gerar_relatorios(df, titulo="Análise de Dados")
+    pattern = os.path.join(file_dir, file_pattern)
+    arquivos = glob.glob(pattern)
+    csv_file = arquivos[0]
+    df = carregar_dados(csv_file)
+    profile = gerar_relatorios(df, titulo="Análise de Pedidos 2025")
     stats = extrair_estatisticas(profile)
     passou = validar_qualidade(stats)
     return 0 if passou else 1
