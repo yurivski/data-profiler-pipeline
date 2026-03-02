@@ -18,7 +18,13 @@ reports_dir = 'reports'
 
 # TODO:
 def carregar_dados(caminho):
-    df = pd.read_csv(caminho)
+    df = pd.read_csv(
+        caminho,
+        sep=';', 
+        encoding='utf-16', 
+        engine='python',
+        on_bad_lines='skip'
+    )
     return df
 
 def gerar_relatorios(df, titulo=None):
