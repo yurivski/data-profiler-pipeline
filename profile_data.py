@@ -32,28 +32,42 @@ def gerar_relatorios(df, titulo=None):
         titulo = f"Profile {datetime.now():%Y-%m-%d %H:%M}"
 
         # True = rápido, menos detalhes / False = mais lento e mais completo
-        profile = ProfileReport(
-            df,
-            title=titulo,
-            minimal=False
-        )
+    profile = ProfileReport(
+        df,
+        title=titulo,
+        minimal=True
+    )
 
-        arquivo = f"{reports_dir}/relatorio_{datetime.now():%Y%m%d}.html"
-        profile.to_file(arquivo)
-        return profile
+    arquivo = f"{reports_dir}/relatorio_{datetime.now():%Y%m%d}.html"
+    profile.to_file(arquivo)
+    return profile
 
 def extrair_estatisticas(profile):
     desc = profile.get_description()
-    tabela = desc['table']
 
-    stats = {
-        'total_linhas': tabela['n'],
-        'total_colunas': tabela['n_var'],
-        'duplicatas': tabela['n_duplicates'],
-        'pct_duplicatas': (tabela['n_duplicates'] / tabela['n'] * 100) if tabela['n'] > 0 else 0,
-        'valores_faltantes': tabela['n_cells_missing'],
-        'pct_faltantes': tabela['p_cells_missing'] * 100,
-    }
+    if hasattr(desc, 'table'):
+        tabela = desc.table
+    else:
+        tabela = desc['table']
+
+    if isinstance(tabela, dict):
+        stats = {
+            'total_linhas': tabela['n'],
+            'total_colunas': tabela['n_var'],
+            'duplicatas': tabela['n_duplicates'],
+            'pct_duplicatas': (tabela['n_duplicates'] / tabela['n'] * 100) if tabela['n'] > 0 else 0,
+            'valores_faltantes': tabela['n_cells_missing'],
+            'pct_faltantes': tabela['p_cells_missing'] * 100,
+            }
+    else:
+        stats = {
+            'total_linhas': tabela.n,
+            'total_colunas': tabela.n_var,
+            'duplicatas': tabela.n_duplicates,
+            'pct_duplicatas': (tabela.n_duplicates / tabela.n * 100) if tabela.n > 0 else 0,
+            'valores_faltantes': tabela.n_cells_missing,
+            'pct_faltantes': tabela.p_cells_missing * 100,
+        }
     return stats
 
 def validar_qualidade(stats, max_dup=max_duplicates_pct, max_miss=max_missing_pct):
