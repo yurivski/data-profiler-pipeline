@@ -35,7 +35,7 @@ def gerar_relatorios(df, titulo=None):
     profile = ProfileReport(
         df,
         title=titulo,
-        minimal=True
+        minimal=False
     )
 
     arquivo = f"{reports_dir}/relatorio_{datetime.now():%Y%m%d}.html"
@@ -54,8 +54,8 @@ def extrair_estatisticas(profile):
         stats = {
             'total_linhas': tabela['n'],
             'total_colunas': tabela['n_var'],
-            'duplicatas': tabela['n_duplicates'],
-            'pct_duplicatas': (tabela['n_duplicates'] / tabela['n'] * 100) if tabela['n'] > 0 else 0,
+            'duplicates': tabela['n_duplicates'],
+            'pct_duplicates': (tabela['n_duplicates'] / tabela['n'] * 100) if tabela['n'] > 0 else 0,
             'valores_faltantes': tabela['n_cells_missing'],
             'pct_faltantes': tabela['p_cells_missing'] * 100,
             }
@@ -63,8 +63,8 @@ def extrair_estatisticas(profile):
         stats = {
             'total_linhas': tabela.n,
             'total_colunas': tabela.n_var,
-            'duplicatas': tabela.n_duplicates,
-            'pct_duplicatas': (tabela.n_duplicates / tabela.n * 100) if tabela.n > 0 else 0,
+            'duplicates': tabela.n_duplicates,
+            'pct_duplicates': (tabela.n_duplicates / tabela.n * 100) if tabela.n > 0 else 0,
             'valores_faltantes': tabela.n_cells_missing,
             'pct_faltantes': tabela.p_cells_missing * 100,
         }
@@ -82,7 +82,7 @@ def validar_qualidade(stats, max_dup=max_duplicates_pct, max_miss=max_missing_pc
         print(f" Falha: limite é {max_miss}%")
         aprovado = False
     else:
-        printprint(f"Ok: Abaixo do limite de {max_miss}%")
+        print(f"Ok: Abaixo do limite de {max_miss}%")
 
     if aprovado:
         print("Dados carregados")
