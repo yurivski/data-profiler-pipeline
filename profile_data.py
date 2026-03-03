@@ -50,6 +50,9 @@ def gerar_relatorios(df, titulo=None):
     # Define o nome do arquivo salvo
     arquivo = f"{reports_dir}/relatorio_{datetime.now():%Y%m%d}.html"
     profile.to_file(arquivo)
+
+    print()
+    print(f"Relatório salvo: {arquivo}")
     return profile
 
 # Extrai estatísticas do relatório para validação.
@@ -86,8 +89,13 @@ def extrair_estatisticas(profile):
 
 # Valida estatísticas contra thresholds de qualidade.
 def validar_qualidade(stats, max_dup=max_duplicates_pct, max_miss=max_missing_pct):
+
+    print()
+    print("VALIDAÇÃO DE QUALIDADE:")
+
     aprovado = True
 
+    print(f"\nDuplicatas: {stats['pct_duplicates']:.2f}%")
     # Validar duplicatas
     if stats['pct_duplicates'] > max_dup:
         print(f"Falha: Limite é {max_dup}%")
@@ -95,6 +103,7 @@ def validar_qualidade(stats, max_dup=max_duplicates_pct, max_miss=max_missing_pc
     else:
         print(f"Ok: Abaixo do limite de {max_dup}%")
 
+    print(f"\nValores faltantes: {stats['pct_faltantes']:.2f}%")
     # Validar valores faltantes
     if stats['pct_faltantes'] > max_miss:
         print(f" Falha: limite é {max_miss}%")
@@ -102,25 +111,47 @@ def validar_qualidade(stats, max_dup=max_duplicates_pct, max_miss=max_missing_pc
     else:
         print(f"Ok: Abaixo do limite de {max_miss}%")
 
+    print()
     # Resultado final
     if aprovado:
-        print("Dados podem ser carregados")
+        print("Análise concluída")
     else:
         print("Corrigir problemas antes de carregar")
+        print()
     return aprovado
 
 def main():
-    # Encontrar arquivo CSV
-    pattern = os.path.join(file_dir, file_pattern)
-    arquivos = glob.glob(pattern)
-    csv_file = arquivos[0]
-
-    # Validação
-    df = carregar_dados(csv_file)
-    profile = gerar_relatorios(df, titulo="Análise de Pedidos 2025")
-    stats = extrair_estatisticas(profile)
-    passou = validar_qualidade(stats)
-    return 0 if passou else 1
+    try:
+        # Encontrar arquivo CSV
+        pattern = os.path.join(file_dir, file_pattern)
+        arquivos = glob.glob(pattern)
+        
+        if not arquivos:
+            print(f"Nenhum arquivo encontrado em {pattern}")
+            return 1
+        
+        csv_file = arquivos[0]
+        print(f"Arquivo encontrado: {csv_file}")
+        
+        # Validação
+        df = carregar_dados(csv_file)
+        print(f"Dados carregados: {len(df):,} linhas, {len(df.columns)} colunas")
+        print()
+        
+        profile = gerar_relatorios(df, titulo="Análise de Pedidos 2025")
+        stats = extrair_estatisticas(profile)
+        passou = validar_qualidade(stats)
+        
+        return 0 if passou else 1
+        
+    except FileNotFoundError as e:
+        print(f"Arquivo não encontrado - {e}")
+        return 1
+    except Exception as e:
+        print(f"ERRO INESPERADO: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
 
 if __name__ == '__main__':
     exit(main())
